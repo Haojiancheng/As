@@ -34,6 +34,12 @@ dependencies {
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
     compile 'com.orhanobut:logger:2.1.1'
     compile 'com.youth.banner:banner:1.4.10'
+
+    compile('com.github.ihsanbal:LoggingInterceptor:2.0.2') {
+        exclude group: 'org.json', module: 'json'
+    }
+
     testCompile 'junit:junit:4.12'
     compile 'com.google.code.gson:gson:2.8.2'
+    compile 'junit:junit:4.12'
 }
