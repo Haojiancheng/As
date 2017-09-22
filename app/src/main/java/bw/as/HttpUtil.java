@@ -16,12 +16,14 @@ public class HttpUtil {
     //网络请求OKHttp
     public static void sendOkHttpRequest(String address, Callback callback){
         OkHttpClient client = new OkHttpClient();
-        client.networkInterceptors().add(new LoggingInterceptor());
+//        client.networkInterceptors().add(new LoggingInterceptor());
         Request request = new Request.Builder()
                 .url(address)
                 .build();
         client.newCall(request).enqueue(callback);
     }
+
+
 
 
 

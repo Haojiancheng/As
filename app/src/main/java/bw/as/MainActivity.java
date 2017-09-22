@@ -11,8 +11,8 @@ import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
 
 import bw.as.fragment.SimpleFragment;
-import bw.as.fragment.Zhutiribao;
-import bw.as.fragment.Zuixinribao;
+import bw.as.fragment.ZhutiribaoFragment;
+import bw.as.fragment.ZuixinribaoFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager mViewPager;
     private int mTabCount = 4;
     private  String[] title = {"最新日报","专栏","热门","主题日报"};
-    private  Fragment[]  fragments = {new Zhutiribao(),new SimpleFragment(),new SimpleFragment(),new Zuixinribao()};
+    private  Fragment[]  fragments = {new ZuixinribaoFragment(),new SimpleFragment(),new SimpleFragment(),new ZhutiribaoFragment()};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
