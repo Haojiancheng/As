@@ -27,7 +27,9 @@ public class ZhutiribaoAdapter  extends BaseQuickAdapter<Zhutiribao.OthersBean,B
 
     @Override
     protected void convert(BaseViewHolder helper, Zhutiribao.OthersBean item) {
-        helper.setText(R.id.zhuti_item_text,item.getDescription());
+        helper.setText(R.id.zhuti_item_text,item.getDescription())
+                .addOnClickListener(R.id.zhuti_item_image)
+        .addOnClickListener(R.id.zhuti_item_text);
         View view = helper.getView(R.id.zhuti_item_image);
         ImageUtil.loderImage(item.getThumbnail(), (ImageView) view);
     }

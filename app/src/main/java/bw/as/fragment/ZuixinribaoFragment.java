@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -41,6 +42,9 @@ public class ZuixinribaoFragment extends Fragment {
     @BindView(R.id.zuixin_recyclerView)
     RecyclerView zuixinRecyclerView;
     Unbinder unbinder;
+    @BindView(R.id.swipeRefresh)
+    SwipeRefreshLayout swipeRefresh;
+
 
     @Nullable
     @Override
@@ -53,45 +57,64 @@ public class ZuixinribaoFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefresh.setRefreshing(true);
+                sendHttpRequest("http://news-at.zhihu.com/api/4/news/latest");
+            }
+        });
         sendHttpRequest("http://news-at.zhihu.com/api/4/news/latest");
+
     }
 
-    public void sendHttpRequest(String url){
+    public void sendHttpRequest(String url) {
         HttpUtil.sendOkHttpRequest(url, new Callback() {
+
+
+            private ZuixinribaoAdapter zuixinribaoAdapter;
+            List<Zuixinribao.StoriesBean> stories;
+            private LinearLayoutManager linearLayoutManager;
+
             @Override
             public void onFailure(Call call, IOException e) {
                 //异常处理操作
             }
+
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 //得到服务器返回的具体数据
+                stories = new ArrayList<Zuixinribao.StoriesBean>();
                 String responseData = response.body().string();
                 Zuixinribao zuixinribao = new Gson().fromJson(responseData, Zuixinribao.class);
-                List<Zuixinribao.StoriesBean> stories = zuixinribao.getStories();
+                stories.addAll(zuixinribao.getStories());
                 List<Zuixinribao.TopStoriesBean> top_stories = zuixinribao.getTop_stories();
-                final ZuixinribaoAdapter zuixinribaoAdapter = new ZuixinribaoAdapter(R.layout.zuixinribao_item,stories);
+                zuixinribaoAdapter = new ZuixinribaoAdapter(R.layout.zuixinribao_item, stories);
                 final ArrayList<String> imageList = new ArrayList<>();
                 final ArrayList<String> titleList = new ArrayList<>();
-                for(int i = 0;i<top_stories.size();i++){
+                for (int i = 0; i < top_stories.size(); i++) {
                     imageList.add(top_stories.get(i).getImage());
                     titleList.add(top_stories.get(i).getTitle());
                 }
-
-                final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+                linearLayoutManager = new LinearLayoutManager(getActivity());
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        swipeRefresh.setRefreshing(false);
                         zuixinRecyclerView.setLayoutManager(linearLayoutManager);
                         zuixinRecyclerView.setAdapter(zuixinribaoAdapter);
-//                        View inflate = View.inflate(getActivity(), R.layout.zuixinribao_head, null);
-                View inflate = LayoutInflater.from(getActivity()).inflate(R.layout.zuixinribao_head, null);
+                        setBanner();
+                    }
+
+                    private void setBanner() {
+                        View inflate = LayoutInflater.from(getActivity()).inflate(R.layout.zuixinribao_head, null);
                         final Banner banner = inflate.findViewById(R.id.banner);
                         banner.setBannerStyle(BannerConfig.CIRCLE_INDICATOR_TITLE);
                         //设置图片加载器
                         banner.setImageLoader(new ImageLoader() {
                             @Override
                             public void displayImage(Context context, Object path, ImageView imageView) {
-                                ImageUtil.loderImage((String) path,imageView);
+                                ImageUtil.loderImage((String) path, imageView);
                             }
                         });
                         //设置图片集合
@@ -108,6 +131,7 @@ public class ZuixinribaoFragment extends Fragment {
                         //banner设置方法全部调用完毕时最后调用
                         zuixinribaoAdapter.addHeaderView(inflate);
                         banner.start();
+                        zuixinRecyclerView.scrollToPosition(0);
                     }
                 });
             }

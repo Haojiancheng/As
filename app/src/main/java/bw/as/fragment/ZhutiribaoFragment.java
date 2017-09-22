@@ -1,5 +1,6 @@
 package bw.as.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -19,6 +21,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import bw.as.HttpUtil;
 import bw.as.R;
+import bw.as.XiangqingActivity;
 import bw.as.adapter.ZhutiribaoAdapter;
 import bw.as.bean.Zhutiribao;
 import okhttp3.Call;
@@ -59,7 +62,7 @@ public class ZhutiribaoFragment extends Fragment {
             public void onResponse(Call call, Response response) throws IOException {
                 //得到服务器返回的具体数据
                 String responseData = response.body().string();
-                Zhutiribao zhutiribao = new Gson().fromJson(responseData, Zhutiribao.class);
+                final Zhutiribao zhutiribao = new Gson().fromJson(responseData, Zhutiribao.class);
                 List<Zhutiribao.OthersBean> others = zhutiribao.getOthers();
                 final ZhutiribaoAdapter zhutiribaoAdapter = new ZhutiribaoAdapter(R.layout.zhutiribao_item,others);
                 final GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 2);
@@ -69,7 +72,14 @@ public class ZhutiribaoFragment extends Fragment {
                     public void run() {
                         zhutiRecyclerView.setLayoutManager(gridLayoutManager);
                         zhutiRecyclerView.setAdapter(zhutiribaoAdapter);
-
+                        zhutiribaoAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+                            @Override
+                            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+                                Intent intent = new Intent(getActivity(), XiangqingActivity.class);
+                                intent.putExtra("int",11);
+                                startActivity(intent);
+                            }
+                        });
                     }
                 });
             }
